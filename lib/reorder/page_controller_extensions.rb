@@ -1,12 +1,12 @@
 module Reorder::PageControllerExtensions
-
-  %w{move_higher move_lower move_to_top move_to_bottom}.each do |action|
-    define_method action do
-      @page = Page.find(params[:id])
-      @page.parent.reload.children.reload
-      @page.send(action)
-      request.env["HTTP_REFERER"] ? redirect_to(:back) : redirect_to(page_index_url)
-    end
+ 
+  def order
+    ids = params[:pages].uniq.map{|page| page.match(/page-(\d+)/)[1]}
+    Page.find(ids.first).parent.unordered_children(:order => nil).update_all(
+      ['position = FIND_IN_SET(id, ?)', ids.join(',')],
+      { :id => ids }
+    )
+    head :ok
   end
   
 end

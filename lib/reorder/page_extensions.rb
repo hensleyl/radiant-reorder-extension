@@ -3,6 +3,7 @@ module Reorder::PageExtensions
     base.class_eval {
       acts_as_list :scope => :parent_id
       self.reflections[:children].options[:order] = "position ASC"
+      has_many :unordered_children, :class_name => 'Page', :foreign_key => 'parent_id'
     }
     
     if defined?(Page::NONDRAFT_FIELDS)
